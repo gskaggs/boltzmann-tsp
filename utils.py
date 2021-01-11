@@ -3,7 +3,7 @@ import itertools
 
 MAX_DISTANCE = 250
 
-def distanceMatrix():
+def distance_matrix():
     return np.matrix([
     [0,  10, 20, 5,  18],
     [10, 0,  15, 32, 10],
@@ -19,48 +19,18 @@ def path(state):
     return path
 
 
-def pathDistance(distanceMatrix, path):
+def path_distance(distanceMatrix, path):
     distance = 0
     for index in range(len(path))[1:]:
         distance += distanceMatrix[path[index - 1], path[index]]
     return distance + distanceMatrix[path[0], path[-1]]
 
 
+# Check to make sure you visit each city exactly once and that you're at exactly one city at each moment in time.
+# Note: state[i, j] is 1 iff you are at city i at time j, and is 0 otherwise.
 def isPathValid(state):
     assert(state.shape[0] == state.shape[1])
     N = state.shape[0]
-    return not (any([sum(state[idx]) != 1 for idx in range(N)]) or any([sum(state[:, idx]) != 1 for idx in range(N)]))
-
-
-
-# def isPathValid(state):
-#     # count the number of times a city was visited, each city should be
-#     duplicateVisits = 0
-#     dupRowIdx = None
-#     for rowIdx in range(state.shape[0]):
-#         timesVisited = np.sum(state[rowIdx, :])
-
-#         # visiting a city 1 or 2 times are the only numbers which are valid
-#         if timesVisited != 1 and timesVisited != 2:
-#             return False
-
-#         # it is permissible (and expected) to visit the starting city twice
-#         if timesVisited == 2:
-#             duplicateVisits += 1
-#             dupRowIdx = rowIdx
-
-#     # ensure that there is only one duplicate visit
-#     if duplicateVisits != 1:
-#         return False
-
-#     # ensure that it is exactly the first and last node that are duplicates
-#     if state[dupRowIdx,0] != 1 or state[dupRowIdx,-1] != 1:
-#         return False
-
-#     # it is never valid to visit muliple cities simultaneously
-#     for colIdx in range(state.shape[1]):
-#         citiesVisitedAtOnce = np.sum(state[:, colIdx])
-#         if citiesVisitedAtOnce != 1:
-#             return False
-
-#     return True
+    tours_valid  = not any([sum(state[:, idx]) != 1 for idx in range(N)])
+    cities_valid = not any([sum(state[idx])    != 1 for idx in range(N)])
+    return cities_valid and tours_valid

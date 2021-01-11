@@ -3,7 +3,8 @@ import numpy as np
 import random
 
 class TSP:
-    def __init__(self, distMat):
+    def __init__(self, distMat, debug=False):
+        self.debug = debug
         self.distMat = distMat
         self.numCities = distMat.shape[0]
         self.numStates = self.numCities ** 2
@@ -41,21 +42,20 @@ class TSP:
         # ensure that the temperature starts off significantly higher than highest change in consensus that can occur
         return ((penalty * self.numCities * (self.numCities+1)) - bias) * 100
 
-
+    # Probability we assign state (city, tour) a value of 1
     def __prob_on(self, city, tour, temp):
         state = self.states[city, tour]
         states = self.states.copy()
         states[city, tour] = 1
         
         # Energy with state (city, tour) being on - Energy with state (city, tour) off
-        deltaEnergy = np.sum(states * self.weights[city, tour]) 
+        deltaEnergy = max(250, np.sum(states * self.weights[city, tour]))
         exponential = np.exp(deltaEnergy / temp)
         return 1 / (1 + exponential) # Bigger delta energy => smaller probability of being on
 
-
     def solve(self):
-        lastValidState = self.states.copy()
-        lowest_temp = 0.2
+        last_valid_state = self.states.copy()
+        lowest_temp = 0.1
         num_states = self.numCities
         while self.temperature > lowest_temp:
             for _ in range(self.numStates ** 2):
@@ -69,10 +69,12 @@ class TSP:
                     self.states[city, tour] = 1 - self.states[city, tour]
 
                     if utils.isPathValid(self.states):
-                        lastValidState = self.states.copy()
+                        last_valid_state = self.states.copy()
 
             # cooling...
-            self.temperature *= 0.985
+            self.temperature *= 0.99
+            if self.debug:
+                print 'Temp %s Current Distance %d' % (self.temperature, utils.path_distance(self.distMat, utils.path(last_valid_state)))
         
         # by this point the last valid state variable should hold the results of the simulated annealing
-        return utils.path(lastValidState)
+        return utils.path(last_valid_state)

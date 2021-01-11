@@ -19,7 +19,7 @@ def show(title, paths, dist):
     print
 
 if __name__ == "__main__":
-    distanceMatrix = utils.distanceMatrix()
+    distanceMatrix = utils.distance_matrix()
 
     print "%sDistance Matrix%s" % (bcolors.HEADER, bcolors.NORMAL)
     print "  ",str(distanceMatrix).replace("\n","\n   ")
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     distLookup = {}
     for title, func in comparisons:
         paths = func(distanceMatrix)
-        dist = utils.pathDistance(distanceMatrix, paths[0])
+        dist = utils.path_distance(distanceMatrix, paths[0])
         distLookup[title] = dist
         show(title, paths, dist)
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     tsp = boltzmann.TSP(distanceMatrix)
     path = tsp.solve()
-    dist = utils.pathDistance(distanceMatrix, path)
+    dist = utils.path_distance(distanceMatrix, path)
 
     show("boltzmann", [path], dist)
 

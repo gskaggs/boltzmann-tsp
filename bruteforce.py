@@ -12,7 +12,7 @@ def shortestPaths(distanceMatrix):
         # revisit the first node at the end of the route
         curPath = list(curPath) + [curPath[0]]
 
-        pathDistance = utils.pathDistance(distanceMatrix, curPath)
+        pathDistance = utils.path_distance(distanceMatrix, curPath)
 
         if shortestPathDistance == None or pathDistance < shortestPathDistance:
             shortestPathDistance = pathDistance
@@ -35,7 +35,7 @@ def longestPath(distanceMatrix):
         # revisit the first node at the end of the route
         curPath = list(curPath) + [curPath[0]]
 
-        pathDistance = utils.pathDistance(distanceMatrix, curPath)
+        pathDistance = utils.path_distance(distanceMatrix, curPath)
 
         if longestPathDistance == None or pathDistance > longestPathDistance:
             longestPath = curPath
