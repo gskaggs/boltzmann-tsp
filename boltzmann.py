@@ -1,10 +1,10 @@
 import utils
 import numpy as np
+import time
 import random
 
 class TSP:
-    def __init__(self, distMat, debug=False):
-        self.debug = debug
+    def __init__(self, distMat):
         self.distMat = distMat
         self.numCities = distMat.shape[0]
         self.numStates = self.numCities ** 2
@@ -40,7 +40,7 @@ class TSP:
     def __init_temp(self, penalty, bias):
         # should be generally proportional to the number of steps and total cities to visit, but also
         # ensure that the temperature starts off significantly higher than highest change in consensus that can occur
-        return ((penalty * self.numCities * (self.numCities+1)) - bias) * 100
+        return ((penalty * self.numCities * (self.numCities+1)) - bias) * 10000
 
     # Probability we assign state (city, tour) a value of 1
     def __prob_on(self, city, tour, temp):
@@ -49,14 +49,15 @@ class TSP:
         states[city, tour] = 1
         
         # Energy with state (city, tour) being on - Energy with state (city, tour) off
-        deltaEnergy = max(250, np.sum(states * self.weights[city, tour]))
-        exponential = np.exp(deltaEnergy / temp)
+        deltaEnergy = np.sum(states * self.weights[city, tour])
+        exponential = np.exp(min(250, deltaEnergy / temp))
         return 1 / (1 + exponential) # Bigger delta energy => smaller probability of being on
 
     def solve(self):
         last_valid_state = self.states.copy()
         lowest_temp = 0.1
         num_states = self.numCities
+        last_print = time.time()
         while self.temperature > lowest_temp:
             for _ in range(self.numStates ** 2):
                 city = random.randint(0, self.numCities-1)
@@ -73,7 +74,8 @@ class TSP:
 
             # cooling...
             self.temperature *= 0.99
-            if self.debug:
+            if time.time() - last_print >= 1:
+                last_print = time.time()
                 print 'Temp %s Current Distance %d' % (self.temperature, utils.path_distance(self.distMat, utils.path(last_valid_state)))
         
         # by this point the last valid state variable should hold the results of the simulated annealing
